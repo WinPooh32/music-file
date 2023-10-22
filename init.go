@@ -12,7 +12,7 @@ var (
 	tagsRe        *regexp.Regexp
 	tagsLiveAtRe  *regexp.Regexp
 	tagsCoverBy   *regexp.Regexp
-	paranthesisRe *regexp.Regexp
+	parenthesesRe *regexp.Regexp
 )
 
 var groups = map[string][]string{
@@ -99,7 +99,7 @@ func init() {
 
 	tagsRe = rex.New(tagGroups(groups)).MustCompile()
 
-	paranthesisRe = rex.New(
+	parenthesesRe = rex.New(
 		rex.Common.Class(
 			rex.Chars.Single('('),
 			rex.Chars.Single('['),

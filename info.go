@@ -19,12 +19,12 @@ func ExtractTags(filename []byte) (tags Tags) {
 	if tagsCoverBy.Match(filename) {
 		tags = tags.Set(Cover)
 	}
-	tags = tags.Append(extractParanthesisTags(filename))
+	tags = tags.Append(extractParenthesesTags(filename))
 	return tags
 }
 
-func extractParanthesisTags(name []byte) (tags Tags) {
-	for _, match := range paranthesisRe.FindAll(name, -1) {
+func extractParenthesesTags(name []byte) (tags Tags) {
+	for _, match := range parenthesesRe.FindAll(name, -1) {
 		tags = tags.Append(extractTagsByRegexp(match))
 	}
 	return tags
