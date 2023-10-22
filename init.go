@@ -1,0 +1,139 @@
+package musicfile
+
+import (
+	"regexp"
+
+	"github.com/hedhyw/rex/pkg/dialect"
+	"github.com/hedhyw/rex/pkg/dialect/base"
+	"github.com/hedhyw/rex/pkg/rex"
+)
+
+var (
+	tagsRe        *regexp.Regexp
+	tagsLiveAtRe  *regexp.Regexp
+	tagsCoverBy   *regexp.Regexp
+	paranthesisRe *regexp.Regexp
+)
+
+var groups = map[string][]string{
+	Live.String(): {
+		"live",
+		"(живой )?концерт", "кассета",
+	},
+	Remix.String(): {
+		"remix", "mix", "rmx", "alt", "bass", "boost", "disco", "club",
+		"ремикс", "микс", "радио", "видео", "клуб", "бас",
+	},
+	Instrumental.String(): {
+		"instrumental",
+		"инструментал",
+	},
+	Demo.String(): {
+		"demo",
+		"демо",
+	},
+	Orchestral.String(): {
+		"orchestral", "orch",
+		"оркестр",
+	},
+	Interview.String(): {
+		"interview",
+		"интервью",
+	},
+	Interlude.String(): {
+		"interlude",
+		"антракт",
+	},
+	Remaster.String(): {
+		"remaster",
+		"ремастер",
+	},
+	Capella.String(): {
+		"capella", "acapella",
+		"капелла", "акапелла",
+	},
+	Radio.String(): {
+		"radio", "video",
+		"радио", "видео", "радиоверсия", "видеоверсия",
+	},
+	BackingTrack.String(): {
+		"backingtrack", "backing track",
+		"минус",
+	},
+	Fragment.String(): {
+		"fragment",
+		"фрагмент",
+	},
+	Cover.String(): {
+		"cover",
+		"кавер", "ковер", "перепевка", "на русском",
+	},
+	Rehearsal.String(): {
+		"rehearsal",
+		"репетиция",
+	},
+	Bonus.String(): {
+		"bonus",
+		"бонус",
+	},
+	Draft.String(): {
+		"draft",
+		"черновик", "черновое сведение",
+	},
+}
+
+func init() {
+	tagsLiveAtRe = rex.New(
+		rex.Group.Composite(
+			rex.Common.Raw(" - live (from|at|on|in) "),
+			rex.Common.Raw(" - (живой )?концерт (в|на|у) "),
+		).NonCaptured(),
+	).MustCompile()
+
+	tagsCoverBy = rex.New(
+		rex.Group.Composite(
+			rex.Common.Raw("cover by"),
+			rex.Common.Raw("на русском"),
+		).NonCaptured(),
+	).MustCompile()
+
+	tagsRe = rex.New(tagGroups(groups)).MustCompile()
+
+	paranthesisRe = rex.New(
+		rex.Common.Class(
+			rex.Chars.Single('('),
+			rex.Chars.Single('['),
+		),
+
+		rex.Common.NotClass(
+			rex.Chars.Single('('),
+			rex.Chars.Single('['),
+		).Repeat().OneOrMore(),
+
+		rex.Common.Class(
+			rex.Chars.Single(')'),
+			rex.Chars.Single(']'),
+		),
+	).MustCompile()
+}
+
+func tagGroups(groups map[string][]string) base.GroupToken {
+	var tkns []dialect.Token
+
+	for groupName, tokens := range groups {
+		grp := tagRawGroup(tokens...).WithName(groupName)
+		tkns = append(tkns, grp)
+	}
+
+	return rex.Group.Composite(tkns...).NonCaptured()
+}
+
+func tagRawGroup(raws ...string) base.GroupToken {
+	var tkns []dialect.Token
+
+	for _, r := range raws {
+		tkns = append(tkns, rex.Common.Raw(r))
+	}
+
+	return rex.Group.Composite(tkns...)
+}
