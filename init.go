@@ -1,7 +1,6 @@
 package musicfile
 
 import (
-	"fmt"
 	"regexp"
 
 	"github.com/hedhyw/rex/pkg/dialect"
@@ -162,8 +161,6 @@ func init() {
 			).WithName(groupWork),
 		).NonCaptured(),
 	).MustCompile()
-
-	fmt.Println(infoFilenameRe.String())
 }
 
 func tagGroups(groups map[string][]string) base.GroupToken {
