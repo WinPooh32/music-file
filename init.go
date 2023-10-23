@@ -1,6 +1,7 @@
 package musicfile
 
 import (
+	"fmt"
 	"regexp"
 
 	"github.com/hedhyw/rex/pkg/dialect"
@@ -9,10 +10,18 @@ import (
 )
 
 var (
-	tagsRe        *regexp.Regexp
-	tagsLiveAtRe  *regexp.Regexp
-	tagsCoverBy   *regexp.Regexp
-	parenthesesRe *regexp.Regexp
+	tagsRe            *regexp.Regexp
+	tagsLiveAtRe      *regexp.Regexp
+	tagsCoverBy       *regexp.Regexp
+	tagsOriginalMixRe *regexp.Regexp
+	parenthesesRe     *regexp.Regexp
+
+	infoFilenameRe *regexp.Regexp
+)
+
+const (
+	groupAuthor = "Author"
+	groupWork   = "Work"
 )
 
 var groups = map[string][]string{
@@ -97,6 +106,12 @@ func init() {
 		).NonCaptured(),
 	).MustCompile()
 
+	tagsOriginalMixRe = rex.New(
+		rex.Group.Composite(
+			rex.Common.Raw("original mix"),
+		).NonCaptured(),
+	).MustCompile()
+
 	tagsRe = rex.New(tagGroups(groups)).MustCompile()
 
 	parenthesesRe = rex.New(
@@ -115,6 +130,40 @@ func init() {
 			rex.Chars.Single(']'),
 		),
 	).MustCompile()
+
+	infoFilenameRe = rex.New(
+		rex.Chars.Digits().Repeat().OneOrMore(),
+		rex.Chars.Single('.').Repeat().ZeroOrOne(),
+
+		rex.Group.NonCaptured(
+			rex.Chars.Whitespace().Repeat().ZeroOrOne(),
+			rex.Chars.Single('-'),
+		).Repeat().ZeroOrOne(),
+
+		rex.Chars.Whitespace(),
+
+		rex.Group.Composite(
+			rex.Group.NonCaptured(
+				rex.Group.Define(
+					rex.Chars.Any().Repeat().OneOrMore(),
+				).WithName(groupAuthor),
+
+				rex.Chars.Whitespace(),
+				rex.Chars.Single('-'),
+				rex.Chars.Whitespace(),
+
+				rex.Group.Define(
+					rex.Chars.Any().Repeat().OneOrMore(),
+				).WithName(groupWork),
+			).NonCaptured(),
+
+			rex.Group.Composite(
+				rex.Chars.Any().Repeat().OneOrMore(),
+			).WithName(groupWork),
+		).NonCaptured(),
+	).MustCompile()
+
+	fmt.Println(infoFilenameRe.String())
 }
 
 func tagGroups(groups map[string][]string) base.GroupToken {

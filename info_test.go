@@ -1,9 +1,89 @@
 package musicfile
 
 import (
+	"reflect"
 	"strings"
 	"testing"
 )
+
+func TestExtractInfo(t *testing.T) {
+	type args struct {
+		filepath []byte
+	}
+	tests := []struct {
+		name     string
+		args     args
+		wantInfo Info
+	}{
+		{
+			name: "dot work",
+			args: args{
+				filepath: []byte("a b/c/02. d & e/02. work name.mp3"),
+			},
+			wantInfo: Info{
+				Author: "",
+				Album:  "",
+				Work:   "work name",
+				Tags:   EmptyTags,
+			},
+		},
+		{
+			name: "dot dash work",
+			args: args{
+				filepath: []byte("a b/c/02. d & e/02. - work name.mp3"),
+			},
+			wantInfo: Info{
+				Author: "",
+				Album:  "",
+				Work:   "work name",
+				Tags:   EmptyTags,
+			},
+		},
+		{
+			name: "dash work",
+			args: args{
+				filepath: []byte("a b/c/02. d & e/02. - work name.mp3"),
+			},
+			wantInfo: Info{
+				Author: "",
+				Album:  "",
+				Work:   "work name",
+				Tags:   EmptyTags,
+			},
+		},
+		{
+			name: "space author work",
+			args: args{
+				filepath: []byte("a b/c/02. d & e/03 - author - work name.mp3"),
+			},
+			wantInfo: Info{
+				Author: "author",
+				Album:  "",
+				Work:   "work name",
+				Tags:   EmptyTags,
+			},
+		},
+		{
+			name: "space author work original mix",
+			args: args{
+				filepath: []byte("a b/c/02. d & e/03 - author - work name (original mix).mp3"),
+			},
+			wantInfo: Info{
+				Author: "author",
+				Album:  "",
+				Work:   "work name (original mix)",
+				Tags:   EmptyTags,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotInfo := ExtractInfo(tt.args.filepath); !reflect.DeepEqual(gotInfo, tt.wantInfo) {
+				t.Errorf("ExtractInfo() = %v, want %v", gotInfo, tt.wantInfo)
+			}
+		})
+	}
+}
 
 func TestExtractTags(t *testing.T) {
 	type args struct {
