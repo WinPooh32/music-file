@@ -163,3 +163,23 @@ func TestExtractTags(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkExtractInfo(b *testing.B) {
+	var info Info
+	filepath := []byte("a b/c/02. d & e/03 - author - work name (radio edit live original mix).mp3")
+	for i := 0; i < b.N; i++ {
+		info = ExtractInfo(filepath)
+	}
+	nop(info)
+}
+
+func BenchmarkExtractTags(b *testing.B) {
+	var tags Tags
+	filepath := []byte("c cover by d (radio edit live original mix)")
+	for i := 0; i < b.N; i++ {
+		tags = ExtractTags(filepath)
+	}
+	nop(tags)
+}
+
+func nop[T any](a T) {}
