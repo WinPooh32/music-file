@@ -41,6 +41,10 @@ func (t Tags) Has(tag TagBit) bool {
 	return t&(1<<Tags(tag)) != 0
 }
 
+func (t Tags) Intersects(tags Tags) bool {
+	return t&tags != 0
+}
+
 func (t Tags) Names(dst []string) (n int) {
 	if len(dst) < bits {
 		panic(fmt.Sprintf("dst len must be not less than %d", bits))
