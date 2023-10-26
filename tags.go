@@ -50,11 +50,13 @@ func (t Tags) Names(dst []string) (n int) {
 		panic(fmt.Sprintf("dst len must be not less than %d", bits))
 	}
 
+	dst = dst[:0]
+
 	for i := 0; i < bits; i++ {
 		bit := TagBit(i)
 
 		if t.Has(bit) {
-			dst[i] = bit.String()
+			dst = append(dst, bit.String())
 			n++
 		}
 	}
