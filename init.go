@@ -26,7 +26,7 @@ const (
 var groups = map[string][]string{
 	Live.String(): {
 		"live",
-		"(живой )?концерт", "кассета",
+		"(живой )?концерт", "кассета", "радиоэфир",
 	},
 	Remix.String(): {
 		"remix", "mix", "rmx", "alt", "bass", "boost", "disco", "club",
