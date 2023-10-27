@@ -12,7 +12,10 @@ type Info struct {
 func ExtractInfo(filepath []byte) (info Info) {
 	// Split the file path.
 	path := bytes.Split(filepath, []byte("/"))
+	return ExtractPathInfo(path)
+}
 
+func ExtractPathInfo(path [][]byte) (info Info) {
 	if len(path) == 0 {
 		return Info{}
 	}
@@ -20,39 +23,18 @@ func ExtractInfo(filepath []byte) (info Info) {
 	// Extract basename of the file.
 	basename := path[len(path)-1]
 
-	// Exclude file extension.
-	if i := bytes.LastIndexByte(basename, '.'); i >= 0 {
-		basename = basename[0:i]
+	info.Author, info.Album, info.Work, info.Tags = processBasename(basename)
+
+	for i := 0; i < len(path)-1; i++ {
+		dirname := path[i]
+		tags := ExtractDirTags(dirname)
+		info.Tags = info.Tags.Append(tags)
 	}
-
-	// Fill info struct.
-
-	subexpNames := infoFilenameRe.SubexpNames()
-
-	for _, match := range infoFilenameRe.FindAllSubmatch(basename, -1) {
-		for groupIdx, group := range match {
-			if groupIdx == 0 || len(group) == 0 {
-				continue
-			}
-			groupName := subexpNames[groupIdx]
-			if groupName == "" {
-				continue
-			}
-			switch groupName {
-			case groupWork:
-				info.Work = string(group)
-			case groupAuthor:
-				info.Author = string(group)
-			}
-		}
-	}
-
-	info.Tags = ExtractTags(basename)
 
 	return info
 }
 
-func ExtractTags(filename []byte) (tags Tags) {
+func ExtractFilenameTags(filename []byte) (tags Tags) {
 	if tagsLiveAtRe.Match(filename) {
 		tags = tags.Set(Live)
 	}
@@ -65,8 +47,49 @@ func ExtractTags(filename []byte) (tags Tags) {
 	if tagsOriginalMixRe.Match(filename) {
 		tags = tags.Del(Remix)
 	}
+	if tagsMixBy.Match(filename) {
+		tags = tags.Set(Remix)
+	}
 
 	return tags
+}
+
+func ExtractDirTags(dirname []byte) (tags Tags) {
+	tags = ExtractFilenameTags(dirname)
+	return tags
+}
+
+func processBasename(name []byte) (author, album, work string, tags Tags) {
+	// Exclude file extension.
+	if i := bytes.LastIndexByte(name, '.'); i >= 0 {
+		name = name[0:i]
+	}
+
+	// Fill info struct.
+
+	subexpNames := infoFilenameRe.SubexpNames()
+
+	for _, match := range infoFilenameRe.FindAllSubmatch(name, -1) {
+		for groupIdx, group := range match {
+			if groupIdx == 0 || len(group) == 0 {
+				continue
+			}
+			groupName := subexpNames[groupIdx]
+			if groupName == "" {
+				continue
+			}
+			switch groupName {
+			case groupAuthor:
+				author = string(group)
+			case groupWork:
+				work = string(group)
+			}
+		}
+	}
+
+	tags = ExtractFilenameTags(name)
+
+	return author, album, work, tags
 }
 
 func extractParenthesesTags(name []byte) (tags Tags) {

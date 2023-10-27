@@ -157,7 +157,7 @@ func TestExtractTags(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := ExtractTags(tt.args.filename); got != tt.want {
+			if got := ExtractFilenameTags(tt.args.filename); got != tt.want {
 				t.Errorf("ExtractTags() = %v, want %v", got, tt.want)
 			}
 		})
@@ -177,7 +177,7 @@ func BenchmarkExtractTags(b *testing.B) {
 	var tags Tags
 	filepath := []byte("c cover by d (radio edit live original mix)")
 	for i := 0; i < b.N; i++ {
-		tags = ExtractTags(filepath)
+		tags = ExtractFilenameTags(filepath)
 	}
 	nop(tags)
 }
