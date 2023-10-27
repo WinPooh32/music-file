@@ -38,6 +38,9 @@ func ExtractFilenameTags(filename []byte) (tags Tags) {
 	if tagsLiveAtRe.Match(filename) {
 		tags = tags.Set(Live)
 	}
+	if tagsInterviewWithRe.Match(filename) {
+		tags = tags.Set(Interview)
+	}
 	if tagsCoverBy.Match(filename) {
 		tags = tags.Set(Cover)
 	}

@@ -9,12 +9,13 @@ import (
 )
 
 var (
-	tagsRe            *regexp.Regexp
-	tagsLiveAtRe      *regexp.Regexp
-	tagsCoverBy       *regexp.Regexp
-	tagsMixBy         *regexp.Regexp
-	tagsOriginalMixRe *regexp.Regexp
-	parenthesesRe     *regexp.Regexp
+	tagsRe              *regexp.Regexp
+	tagsLiveAtRe        *regexp.Regexp
+	tagsInterviewWithRe *regexp.Regexp
+	tagsCoverBy         *regexp.Regexp
+	tagsMixBy           *regexp.Regexp
+	tagsOriginalMixRe   *regexp.Regexp
+	parenthesesRe       *regexp.Regexp
 
 	infoFilenameRe *regexp.Regexp
 )
@@ -30,19 +31,19 @@ var groups = map[string][]string{
 		"(живой )?концерт", "кассета", "радиоэфир",
 	},
 	Remix.String(): {
-		"remix", "mix", "rmx", "alt", "bass", "boost", "disco", "club",
+		"remix", "mix", "rmx", "alt", "bass", "boost", "disco", "club", "offmix",
 		"ремикс", "микс", "радио", "видео", "клуб", "бас",
 	},
 	Instrumental.String(): {
-		"instrumental", "instrumentals",
-		"инструментал",
+		"instrument", "instrumental", "instrumentals",
+		"инструмент", "инструментал",
 	},
 	Demo.String(): {
 		"demo",
 		"демо",
 	},
 	Orchestral.String(): {
-		"orchestral", "orch",
+		"orchestra", "orchestral", "orch",
 		"оркестр",
 	},
 	Interview.String(): {
@@ -66,7 +67,7 @@ var groups = map[string][]string{
 		"радио", "видео", "радиоверсия", "видеоверсия",
 	},
 	BackingTrack.String(): {
-		"backingtrack", "backing track",
+		"backingtrack", "back(ing)? track",
 		"минус",
 	},
 	Fragment.String(): {
@@ -87,7 +88,7 @@ var groups = map[string][]string{
 	},
 	Draft.String(): {
 		"draft",
-		"черновик", "черновое сведение",
+		"черновик", "чернов(ое)? сведение",
 	},
 }
 
@@ -96,6 +97,16 @@ func init() {
 		rex.Group.Composite(
 			rex.Common.Raw(" - live (from|at|on|in) "),
 			rex.Common.Raw(" - (живой )?концерт (в|на|у|из) "),
+			rex.Common.Raw("na stadione|на стадион(е)?"),
+			rex.Common.Raw("концерт(н)?(ные)? запис(и)?"),
+			rex.Common.Raw("на рад(ио)? "),
+		).NonCaptured(),
+	).MustCompile()
+
+	tagsInterviewWithRe = rex.New(
+		rex.Group.Composite(
+			rex.Common.Raw("interview"),
+			rex.Common.Raw("intervyu|интерв|интервью"),
 		).NonCaptured(),
 	).MustCompile()
 
