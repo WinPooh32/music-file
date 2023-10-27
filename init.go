@@ -95,7 +95,7 @@ func init() {
 	tagsLiveAtRe = rex.New(
 		rex.Group.Composite(
 			rex.Common.Raw(" - live (from|at|on|in) "),
-			rex.Common.Raw(" - (живой )?концерт (в|на|у) "),
+			rex.Common.Raw(" - (живой )?концерт (в|на|у|из) "),
 		).NonCaptured(),
 	).MustCompile()
 
@@ -114,7 +114,7 @@ func init() {
 
 	tagsOriginalMixRe = rex.New(
 		rex.Group.Composite(
-			rex.Common.Raw("original mix"),
+			rex.Common.Raw("origin(al)? mix"),
 		).NonCaptured(),
 	).MustCompile()
 
