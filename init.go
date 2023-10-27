@@ -12,6 +12,7 @@ var (
 	tagsRe            *regexp.Regexp
 	tagsLiveAtRe      *regexp.Regexp
 	tagsCoverBy       *regexp.Regexp
+	tagsMixBy         *regexp.Regexp
 	tagsOriginalMixRe *regexp.Regexp
 	parenthesesRe     *regexp.Regexp
 
@@ -33,7 +34,7 @@ var groups = map[string][]string{
 		"ремикс", "микс", "радио", "видео", "клуб", "бас",
 	},
 	Instrumental.String(): {
-		"instrumental",
+		"instrumental", "instrumentals",
 		"инструментал",
 	},
 	Demo.String(): {
@@ -102,6 +103,12 @@ func init() {
 		rex.Group.Composite(
 			rex.Common.Raw("cover by"),
 			rex.Common.Raw("на русском"),
+		).NonCaptured(),
+	).MustCompile()
+
+	tagsMixBy = rex.New(
+		rex.Group.Composite(
+			rex.Common.Raw("mix by"),
 		).NonCaptured(),
 	).MustCompile()
 
