@@ -155,15 +155,17 @@ func init() {
 	).MustCompile()
 
 	infoFilenameRe = rex.New(
-		rex.Chars.Digits().Repeat().OneOrMore(),
-		rex.Chars.Single('.').Repeat().ZeroOrOne(),
-
 		rex.Group.NonCaptured(
-			rex.Chars.Whitespace().Repeat().ZeroOrOne(),
-			rex.Chars.Single('-'),
-		).Repeat().ZeroOrOne(),
+			rex.Chars.Digits().Repeat().OneOrMore(),
+			rex.Chars.Single('.').Repeat().ZeroOrOne(),
 
-		rex.Chars.Whitespace().Repeat().ZeroOrOne(),
+			rex.Group.NonCaptured(
+				rex.Chars.Whitespace().Repeat().ZeroOrOne(),
+				rex.Chars.Single('-'),
+			).Repeat().ZeroOrOne(),
+
+			rex.Chars.Whitespace().Repeat().ZeroOrOne(),
+		).Repeat().ZeroOrOne(),
 
 		rex.Group.Composite(
 			rex.Group.NonCaptured(
@@ -185,6 +187,7 @@ func init() {
 			).WithName(groupWork),
 		).NonCaptured(),
 	).MustCompile()
+
 }
 
 func tagGroups(groups map[string][]string) base.GroupToken {
