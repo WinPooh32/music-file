@@ -81,6 +81,11 @@ func processBasename(name []byte) (author, album, work string, tags Tags, fileEx
 
 	// Fill info struct.
 
+	tags = ExtractFilenameTags(name)
+
+	// Delete all parentheses's content.
+	name = parenthesesRe.ReplaceAll(name, []byte{})
+
 	subexpNames := infoFilenameRe.SubexpNames()
 
 	for _, match := range infoFilenameRe.FindAllSubmatch(name, -1) {
@@ -92,16 +97,24 @@ func processBasename(name []byte) (author, album, work string, tags Tags, fileEx
 			if groupName == "" {
 				continue
 			}
+
+			switch groupName {
+			case groupAuthor, groupWork:
+			default:
+				continue
+			}
+
+			s := string(group)
+			s = strings.TrimSpace(s)
+
 			switch groupName {
 			case groupAuthor:
-				author = strings.TrimSpace(string(group))
+				author = s
 			case groupWork:
-				work = strings.TrimSpace(string(group))
+				work = s
 			}
 		}
 	}
-
-	tags = ExtractFilenameTags(name)
 
 	return author, album, work, tags, fileExtension
 }
