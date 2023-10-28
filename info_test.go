@@ -29,6 +29,45 @@ func TestExtractInfo(t *testing.T) {
 			},
 		},
 		{
+			name: "parentheses 2",
+			args: args{
+				filepath: []byte("03-author-work (abcd-efg. abcd.mp3"),
+			},
+			wantInfo: Info{
+				Author:        "author",
+				Album:         "",
+				Work:          "work",
+				Tags:          EmptyTags,
+				FileExtension: ".mp3",
+			},
+		},
+		{
+			name: "parentheses 3",
+			args: args{
+				filepath: []byte("03-author-work (ab (c) d).mp3"),
+			},
+			wantInfo: Info{
+				Author:        "author",
+				Album:         "",
+				Work:          "work",
+				Tags:          EmptyTags,
+				FileExtension: ".mp3",
+			},
+		},
+		{
+			name: "parentheses 4",
+			args: args{
+				filepath: []byte("03-author-work (.mp3"),
+			},
+			wantInfo: Info{
+				Author:        "author",
+				Album:         "",
+				Work:          "work",
+				Tags:          EmptyTags,
+				FileExtension: ".mp3",
+			},
+		},
+		{
 			name: "-",
 			args: args{
 				filepath: []byte("/a/01-author - work(mix).mp3"),

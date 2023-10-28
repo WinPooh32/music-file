@@ -84,7 +84,17 @@ func processBasename(name []byte) (author, album, work string, tags Tags, fileEx
 	tags = ExtractFilenameTags(name)
 
 	// Delete all parentheses's content.
-	name = parenthesesRe.ReplaceAll(name, []byte{})
+	for parenthesesRe.Match(name) {
+		name = parenthesesRe.ReplaceAll(name, []byte{})
+	}
+
+	if bytes.ContainsRune(name, '(') {
+		name = bytes.ReplaceAll(name, []byte{'('}, []byte{})
+	}
+
+	if bytes.ContainsRune(name, '[') {
+		name = bytes.ReplaceAll(name, []byte{'['}, []byte{})
+	}
 
 	subexpNames := infoFilenameRe.SubexpNames()
 

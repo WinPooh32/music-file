@@ -140,12 +140,17 @@ func init() {
 
 		rex.Common.NotClass(
 			rex.Chars.Single('('),
+			rex.Chars.Single(')'),
 			rex.Chars.Single('['),
+			rex.Chars.Single(']'),
 		).Repeat().OneOrMore(),
 
-		rex.Common.Class(
-			rex.Chars.Single(')'),
-			rex.Chars.Single(']'),
+		rex.Group.Composite(
+			rex.Common.Class(
+				rex.Chars.Single(')'),
+				rex.Chars.Single(']'),
+			),
+			rex.Chars.End(),
 		),
 	).MustCompile()
 
