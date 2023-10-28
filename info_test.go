@@ -16,6 +16,19 @@ func TestExtractInfo(t *testing.T) {
 		wantInfo Info
 	}{
 		{
+			name: "_",
+			args: args{
+				filepath: []byte("/a/01-author - work(mix).mp3"),
+			},
+			wantInfo: Info{
+				Author:        "author",
+				Album:         "",
+				Work:          "work(mix)",
+				Tags:          EmptyTags.Set(Remix),
+				FileExtension: ".mp3",
+			},
+		},
+		{
 			name: "dot work",
 			args: args{
 				filepath: []byte("a b/c/02. d & e/02. work name.mp3"),

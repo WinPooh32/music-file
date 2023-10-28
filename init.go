@@ -32,10 +32,11 @@ var groups = map[string][]string{
 	},
 	Remix.String(): {
 		"remix", "mix", "rmx", "alt", "bass", "boost", "disco", "club", "offmix",
+		"(metal|rock|piano|guitar|sax|danc) version",
 		"ремикс", "микс", "радио", "видео", "клуб", "бас",
 	},
 	Instrumental.String(): {
-		"instrument", "instrumental", "instrumentals",
+		"instrument", "instrumental", "instrumentals", "acoust",
 		"инструмент", "инструментал",
 	},
 	Demo.String(): {
@@ -67,11 +68,11 @@ var groups = map[string][]string{
 		"радио", "видео", "радиоверсия", "видеоверсия",
 	},
 	BackingTrack.String(): {
-		"backingtrack", "back(ing)? track",
-		"минус",
+		"backingtrack", "back(ing)? track", "karaok",
+		"минус", "караоке",
 	},
 	Fragment.String(): {
-		"fragment",
+		"fragment", "cut version",
 		"фрагмент",
 	},
 	Cover.String(): {
@@ -125,7 +126,7 @@ func init() {
 
 	tagsOriginalMixRe = rex.New(
 		rex.Group.Composite(
-			rex.Common.Raw("origin(al)? mix"),
+			rex.Common.Raw("origin(al)? (mix|version)"),
 		).NonCaptured(),
 	).MustCompile()
 
@@ -157,7 +158,7 @@ func init() {
 			rex.Chars.Single('-'),
 		).Repeat().ZeroOrOne(),
 
-		rex.Chars.Whitespace(),
+		rex.Chars.Whitespace().Repeat().ZeroOrOne(),
 
 		rex.Group.Composite(
 			rex.Group.NonCaptured(
@@ -165,9 +166,9 @@ func init() {
 					rex.Chars.Any().Repeat().OneOrMore(),
 				).WithName(groupAuthor),
 
-				rex.Chars.Whitespace(),
+				rex.Chars.Whitespace().Repeat().ZeroOrOne(),
 				rex.Chars.Single('-'),
-				rex.Chars.Whitespace(),
+				rex.Chars.Whitespace().Repeat().ZeroOrOne(),
 
 				rex.Group.Define(
 					rex.Chars.Any().Repeat().OneOrMore(),

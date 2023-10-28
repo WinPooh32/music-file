@@ -94,9 +94,9 @@ func processBasename(name []byte) (author, album, work string, tags Tags, fileEx
 			}
 			switch groupName {
 			case groupAuthor:
-				author = string(group)
+				author = strings.TrimSpace(string(group))
 			case groupWork:
-				work = string(group)
+				work = strings.TrimSpace(string(group))
 			}
 		}
 	}
