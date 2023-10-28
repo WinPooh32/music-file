@@ -23,7 +23,7 @@ func TestExtractInfo(t *testing.T) {
 			wantInfo: Info{
 				Author:        "",
 				Album:         "",
-				Work:          "",
+				Work:          "a",
 				Tags:          EmptyTags,
 				FileExtension: ".mp3",
 			},

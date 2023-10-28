@@ -116,6 +116,12 @@ func processBasename(name []byte) (author, album, work string, tags Tags, fileEx
 		}
 	}
 
+	if work == "" {
+		s := string(name)
+		s = strings.TrimSpace(s)
+		work = string(s)
+	}
+
 	return author, album, work, tags, fileExtension
 }
 
