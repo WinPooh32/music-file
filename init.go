@@ -9,13 +9,14 @@ import (
 )
 
 var (
-	tagsRe              *regexp.Regexp
-	tagsLiveAtRe        *regexp.Regexp
-	tagsInterviewWithRe *regexp.Regexp
-	tagsCoverBy         *regexp.Regexp
-	tagsMixBy           *regexp.Regexp
-	tagsOriginalMixRe   *regexp.Regexp
-	parenthesesRe       *regexp.Regexp
+	tagsRe               *regexp.Regexp
+	tagsLiveAtRe         *regexp.Regexp
+	tagsFilenameLiveAtRe *regexp.Regexp
+	tagsInterviewWithRe  *regexp.Regexp
+	tagsCoverBy          *regexp.Regexp
+	tagsMixBy            *regexp.Regexp
+	tagsOriginalMixRe    *regexp.Regexp
+	parenthesesRe        *regexp.Regexp
 
 	infoFilenameRe *regexp.Regexp
 )
@@ -95,6 +96,16 @@ var groups = map[string][]string{
 
 func init() {
 	tagsLiveAtRe = rex.New(
+		rex.Group.Composite(
+			rex.Common.Raw(" -[^-]*live( (from|at|on|in) )?"),
+			rex.Common.Raw(" - (живой )?концерт (в|на|у|из) "),
+			rex.Common.Raw("na stadione|на стадион(е)?"),
+			rex.Common.Raw("концерт(н)?(ные)? запис(и)?"),
+			rex.Common.Raw("на рад(ио)? "),
+		).NonCaptured(),
+	).MustCompile()
+
+	tagsFilenameLiveAtRe = rex.New(
 		rex.Group.Composite(
 			rex.Common.Raw(" - live (from|at|on|in) "),
 			rex.Common.Raw(" - (живой )?концерт (в|на|у|из) "),

@@ -16,6 +16,65 @@ func TestExtractInfo(t *testing.T) {
 		wantInfo Info
 	}{
 		{
+			name: "one slash",
+			args: args{
+				filepath: []byte("/"),
+			},
+			wantInfo: Info{FileExtension: "."},
+		},
+		{
+			name: "complex live 1",
+			args: args{
+				filepath: []byte("/author - 2011 - acoustic live from radio 538/work.mp3"),
+			},
+			wantInfo: Info{
+				Author:        "",
+				Album:         "",
+				Work:          "work",
+				Tags:          EmptyTags.Set(Live),
+				FileExtension: ".mp3",
+			},
+		},
+		{
+			name: "complex live 2",
+			args: args{
+				filepath: []byte("/author - live a b c d/work.mp3"),
+			},
+			wantInfo: Info{
+				Author:        "",
+				Album:         "",
+				Work:          "work",
+				Tags:          EmptyTags.Set(Live),
+				FileExtension: ".mp3",
+			},
+		},
+		{
+			name: "not live 2",
+			args: args{
+				filepath: []byte("/i like to live/work.mp3"),
+			},
+			wantInfo: Info{
+				Author:        "",
+				Album:         "",
+				Work:          "work",
+				Tags:          EmptyTags,
+				FileExtension: ".mp3",
+			},
+		},
+		{
+			name: "not live 2",
+			args: args{
+				filepath: []byte("50-60-70-80-90/author - work live work.mp3"),
+			},
+			wantInfo: Info{
+				Author:        "author",
+				Album:         "",
+				Work:          "work live work",
+				Tags:          EmptyTags,
+				FileExtension: ".mp3",
+			},
+		},
+		{
 			name: "parentheses",
 			args: args{
 				filepath: []byte("a (e;;moll).mp3"),

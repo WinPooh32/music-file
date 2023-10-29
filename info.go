@@ -39,7 +39,7 @@ func ExtractPathInfo(path [][]byte) (info Info) {
 }
 
 func ExtractFilenameTags(filename []byte) (tags Tags) {
-	if tagsLiveAtRe.Match(filename) {
+	if tagsFilenameLiveAtRe.Match(filename) {
 		tags = tags.Set(Live)
 	}
 	if tagsInterviewWithRe.Match(filename) {
@@ -62,7 +62,25 @@ func ExtractFilenameTags(filename []byte) (tags Tags) {
 }
 
 func ExtractDirTags(dirname []byte) (tags Tags) {
-	tags = ExtractFilenameTags(dirname)
+	if tagsLiveAtRe.Match(dirname) {
+		tags = tags.Set(Live)
+	}
+	if tagsInterviewWithRe.Match(dirname) {
+		tags = tags.Set(Interview)
+	}
+	if tagsCoverBy.Match(dirname) {
+		tags = tags.Set(Cover)
+	}
+
+	tags = tags.Append(extractParenthesesTags(dirname))
+
+	if tagsOriginalMixRe.Match(dirname) {
+		tags = tags.Del(Remix)
+	}
+	if tagsMixBy.Match(dirname) {
+		tags = tags.Set(Remix)
+	}
+
 	return tags
 }
 
