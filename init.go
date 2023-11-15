@@ -28,8 +28,8 @@ const (
 
 var groups = map[string][]string{
 	Live.String(): {
-		"live",
-		"(живой )?концерт", "кассета", "радиоэфир",
+		"live", "bootleg",
+		"(живой )?концерт", "кассета", "радиоэфир", "бутлег",
 	},
 	Remix.String(): {
 		"remix", "mix", "rmx", "alt", "bass", "boost", "disco", "club", "offmix",
@@ -77,8 +77,8 @@ var groups = map[string][]string{
 		"фрагмент",
 	},
 	Cover.String(): {
-		"cover",
-		"кавер", "ковер", "перепевка", "на русском",
+		"cover", "tribute",
+		"кавер", "ковер", "перепевка", "на русском", "трибьют",
 	},
 	Rehearsal.String(): {
 		"rehearsal",
@@ -98,6 +98,10 @@ func init() {
 	tagsLiveAtRe = rex.New(
 		rex.Group.Composite(
 			rex.Common.Raw(" -[^-]*live( (from|at|on|in) )?"),
+			rex.Common.Raw("bootleg|outtake"),
+			rex.Common.Raw("live vol"),
+			rex.Common.Raw("live album"),
+			rex.Common.Raw("rare track(s)?"),
 			rex.Common.Raw(" - (живой )?концерт (в|на|у|из) "),
 			rex.Common.Raw("na stadione|на стадион(е)?"),
 			rex.Common.Raw("концерт(н)?(ные)? запис(и)?"),
@@ -108,6 +112,7 @@ func init() {
 	tagsFilenameLiveAtRe = rex.New(
 		rex.Group.Composite(
 			rex.Common.Raw(" - live (from|at|on|in) "),
+			rex.Common.Raw("bootleg|outtake"),
 			rex.Common.Raw(" - (живой )?концерт (в|на|у|из) "),
 			rex.Common.Raw("na stadione|на стадион(е)?"),
 			rex.Common.Raw("концерт(н)?(ные)? запис(и)?"),
@@ -126,6 +131,7 @@ func init() {
 		rex.Group.Composite(
 			rex.Common.Raw("cover by"),
 			rex.Common.Raw("на русском"),
+			rex.Common.Raw("трибьют(ы)?"),
 		).NonCaptured(),
 	).MustCompile()
 
