@@ -77,8 +77,8 @@ var groups = map[string][]string{
 		"фрагмент",
 	},
 	Cover.String(): {
-		"cover", "tribute",
-		"кавер", "ковер", "перепевка", "на русском", "трибьют",
+		"cover", "tribute", "parody",
+		"кавер", "ковер", "перепевка", "на русском", "трибьют", "пародия( на)?",
 	},
 	Rehearsal.String(): {
 		"rehearsal",
@@ -97,6 +97,7 @@ var groups = map[string][]string{
 func init() {
 	tagsLiveAtRe = rex.New(
 		rex.Group.Composite(
+			rex.Common.Raw("live at"),
 			rex.Common.Raw(" -[^-]*live( (from|at|on|in) )?"),
 			rex.Common.Raw("bootleg|outtake"),
 			rex.Common.Raw("live vol"),
@@ -130,8 +131,10 @@ func init() {
 	tagsCoverBy = rex.New(
 		rex.Group.Composite(
 			rex.Common.Raw("cover by"),
+			rex.Common.Raw(" - cover"),
 			rex.Common.Raw("на русском"),
 			rex.Common.Raw("трибьют(ы)?"),
+			rex.Common.Raw(" - парод(ия|ии)? (( на)|\\,)?"),
 		).NonCaptured(),
 	).MustCompile()
 

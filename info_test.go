@@ -204,6 +204,19 @@ func TestExtractInfo(t *testing.T) {
 				FileExtension: ".mp3",
 			},
 		},
+		{
+			name: "live at",
+			args: args{
+				filepath: []byte("zxc live at abvcd/03 - author - work name (original mix).mp3"),
+			},
+			wantInfo: Info{
+				Author:        "author",
+				Album:         "",
+				Work:          "work name",
+				Tags:          EmptyTags.Set(Live),
+				FileExtension: ".mp3",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -283,6 +296,16 @@ func TestExtractTags(t *testing.T) {
 			args: args{filename: []byte(strings.ToLower("a - b c d на русском e"))},
 			want: EmptyTags.Set(Cover),
 		},
+		{
+			name: "cover by 3",
+			args: args{filename: []byte(strings.ToLower("a (m parody)"))},
+			want: EmptyTags.Set(Cover),
+		},
+		{
+			name: "not cover",
+			args: args{filename: []byte(strings.ToLower("parody name"))},
+			want: EmptyTags,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -312,3 +335,36 @@ func BenchmarkExtractTags(b *testing.B) {
 }
 
 func nop[T any](a T) {}
+
+func TestExtractDirTags(t *testing.T) {
+	type args struct {
+		dirname []byte
+	}
+	tests := []struct {
+		name     string
+		args     args
+		wantTags Tags
+	}{
+		{
+			name: "cover",
+			args: args{
+				dirname: []byte("8-й альбом - пародии, посвящённые группе"),
+			},
+			wantTags: EmptyTags.Set(Cover),
+		},
+		{
+			name: "cover 2",
+			args: args{
+				dirname: []byte("/дискография/27-й альбом - пародии, посвящённые группе"),
+			},
+			wantTags: EmptyTags.Set(Cover),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotTags := ExtractDirTags(tt.args.dirname); gotTags != tt.wantTags {
+				t.Errorf("ExtractDirTags() = %v, want %v", gotTags, tt.wantTags)
+			}
+		})
+	}
+}
